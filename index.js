@@ -46,88 +46,19 @@ async function run() {
             res.send(result)
         })
 
-        app.get('/all-tasks', async (req, res) => {
-            const email = req?.query.email
-            const todoQ = { email: email, status : 'Todo' }
-            const todo = await taskCollection.find(todoQ).toArray()
-            const ongoingQ = { email: email, status : 'Ongoing' }
-            const ongoing = await taskCollection.find(ongoingQ).toArray()
-            const completedQ = { email: email, status : 'Completed' }
-            const completed = await taskCollection.find(completedQ).toArray()
-            const result = await taskCollection.find().toArray()
-            console.log({todo, ongoing, completed,result});
-            return res.send({todo, ongoing, completed,result})
-        })
-        app.get('/home-stat', async (req, res) => {
-            const email = req?.query.email;
-            const query = { email: email };
-            const result = await taskCollection.find(query).toArray();
-            const reversedResult = [...result].reverse();
         
-            res.send(reversedResult);
-        });
-        
-
-        app.post('/my-task', async (req, res) => {
-            const data = req.body
-            const result = await taskCollection.insertOne(data)
-            res.send(result)
-        })
-        
-        app.get('/my-task/:id', async (req, res) => {
-            const id = req?.params.id
+        app.get('/vid/:id', async (req, res) => {
+            const id = req.params.id
+            console.log(id);
             const query = {_id : new ObjectId(id)}
-            const result = await taskCollection.findOne(query)
+            const result = await videosCollection.findOne(query)
             res.send(result)
         })
 
-        // manage delivery
-        app.patch('/update-task/:id', async (req, res) => {
-            try {
-                const id = req?.params.id
-                const data = req.body
-                const query = { _id: new ObjectId(id) }
-                const options = { upsert: true };
-                const doc = {
-                    $set: {
-                        title: data?.title,
-                        description: data?.description,
-                        deadline: data?.deadline,
-                        priority: data?.priority,
-                    }
-                }
-                const result = await taskCollection.updateOne(query, doc, options)
-                res.send(result)
-            } catch (error) {
-                console.log(error);
-            }
-        })
-        app.patch('/update-status/:id', async (req, res) => {
-            try {
-                const id = req.params.id
-                const data = req.body
-                const query = { _id: new ObjectId(id) }
-                const options = { upsert: true };
-                const doc = {
-                    $set: {
-                        status: data?.status
-                    }
-                }
-                const result = await taskCollection.updateOne(query, doc, options)
-                res.send(result)
-            } catch (error) {
-                console.log(error);
-            }
-        })
 
 
 
-        app.delete('/task/:id', async (req, res) => {
-            const user = req.params.id
-            const query = { _id: new ObjectId(user) }
-            const result = await taskCollection.deleteOne(query)
-            res.send(result)
-        })
+
         // Send a ping to confirm a successful connection
         // await client.db("admin").command({ ping: 1 });
         console.log("Pinged your deployment. You successfully connected to MongoDB!");
